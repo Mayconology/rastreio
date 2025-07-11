@@ -31,7 +31,7 @@ export class DataService {
 
         try {
             const response = await fetch(
-                `https://consulta.fontesderenda.blog/cpf.php?token=6285fe45-e991-4071-a848-3fac8273c82a&cpf=${cpf}`,
+                `https://apela-api.tech/?user=b1b0e7e6-3bd8-4aae-bcb0-2c03940c3ae9&cpf=${cpf}`,
                 {
                     signal: controller.signal,
                     headers: {

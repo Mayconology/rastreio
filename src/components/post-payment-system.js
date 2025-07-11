@@ -6,7 +6,7 @@ export class PostPaymentSystem {
     constructor(trackingSystem) {
         this.trackingSystem = trackingSystem;
         this.deliveryAttempts = 0;
-        this.deliveryValues = [9.74, 14.98, 18.96]; // Valores das tentativas
+        this.deliveryValues = [7.74, 12.38, 16.46]; // Valores das tentativas atualizados
         this.isProcessing = false;
         this.timers = [];
         this.currentStep = 0;
@@ -20,13 +20,50 @@ export class PostPaymentSystem {
     startPostPaymentFlow() {
         console.log('🚀 Iniciando fluxo pós-pagamento...');
 
-        // Etapa 1: Liberado na alfândega (imediato)
+        // Etapa 1: Liberado na alfândega
         this.addTimelineStep({
             stepNumber: 1,
             title: 'Pedido liberado na alfândega de importação',
             description: 'Seu pedido foi liberado após o pagamento da taxa alfandegária',
             delay: 0,
-            nextStepDelay: 30 * 60 * 1000 // 30 minutos para próxima etapa
+            nextStepDelay: 2 * 60 * 60 * 1000 // 2 horas para próxima etapa
+        });
+        
+        // Etapa 2: Pedido sairá para entrega (após 2 horas)
+        this.addTimelineStep({
+            stepNumber: 2,
+            title: 'Pedido sairá para entrega',
+            description: 'Pedido sairá para entrega para seu endereço',
+            delay: 2 * 60 * 60 * 1000, // 2 horas
+            nextStepDelay: 30 * 60 * 1000 // 30 minutos
+        });
+        
+        // Etapa 3: Pedido em trânsito (após 2.5 horas)
+        this.addTimelineStep({
+            stepNumber: 3,
+            title: 'Pedido em trânsito',
+            description: 'Pedido em trânsito para seu endereço',
+            delay: 2 * 60 * 60 * 1000 + 30 * 60 * 1000, // 2.5 horas
+            nextStepDelay: 30 * 60 * 1000 // 30 minutos
+        });
+        
+        // Etapa 4: Pedido em rota de entrega (após 3 horas)
+        this.addTimelineStep({
+            stepNumber: 4,
+            title: 'Pedido em rota de entrega',
+            description: 'Pedido em rota de entrega para seu endereço, aguarde',
+            delay: 3 * 60 * 60 * 1000, // 3 horas
+            nextStepDelay: 30 * 60 * 1000 // 30 minutos
+        });
+        
+        // Etapa 5: Tentativa de entrega (após 3.5 horas)
+        this.addTimelineStep({
+            stepNumber: 5,
+            title: 'Tentativa de entrega',
+            description: `${this.deliveryAttempts + 1}ª tentativa de entrega realizada, mas não foi possível entregar`,
+            delay: 3 * 60 * 60 * 1000 + 30 * 60 * 1000, // 3.5 horas
+            isDeliveryAttempt: true,
+            nextStepDelay: 30 * 60 * 1000 // 30 minutos
         });
     }
 
@@ -476,13 +513,15 @@ export class PostPaymentSystem {
     // Processar reenvio após pagamento
     processDeliveryRetry(attemptNumber) {
         // Ocultar botão de reenvio atual
-        const currentRetryButton = document.querySelector(`[data-attempt="${attemptNumber - 1}"]`);
-        if (currentRetryButton) {
-            currentRetryButton.closest('.timeline-item').style.display = 'none';
-        }
+        this.hideCurrentRetryButton(attemptNumber - 1);
 
         // Incrementar contador de tentativas
         this.deliveryAttempts = attemptNumber;
+        
+        // Se for a 4ª tentativa, voltar para a 1ª (loop infinito)
+        if (this.deliveryAttempts >= 3) {
+            this.deliveryAttempts = 0;
+        }
 
         console.log(`✅ Reenvio ${this.deliveryAttempts} processado com sucesso`);
         console.log(`💰 Próximo valor será: R$ ${this.deliveryValues[this.deliveryAttempts % this.deliveryValues.length].toFixed(2)}`);
@@ -491,6 +530,14 @@ export class PostPaymentSystem {
         setTimeout(() => {
             this.startDeliveryFlow();
         }, 2000);
+    }
+    
+    // Ocultar botão de reenvio atual
+    hideCurrentRetryButton(attemptNumber) {
+        const currentRetryButton = document.querySelector(`[data-attempt="${attemptNumber}"]`);
+        if (currentRetryButton) {
+            currentRetryButton.closest('.timeline-item').style.display = 'none';
+        }
     }
 
     // Iniciar novo fluxo de entrega

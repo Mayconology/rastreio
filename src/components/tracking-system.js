@@ -16,6 +16,8 @@ export class TrackingSystem {
         this.zentraPayService = new ZentraPayService();
         this.isInitialized = false;
         this.pixData = null;
+        this.paymentErrorShown = false;
+        this.paymentRetryCount = 0;
         
         console.log('TrackingSystem inicializado com Zentra Pay oficial');
         this.initWhenReady();
@@ -621,6 +623,79 @@ export class TrackingSystem {
             }, 1000);
         }
     }
+    
+    // Mostrar erro de pagamento
+    showPaymentError() {
+        this.paymentErrorShown = true;
+        
+        const errorOverlay = document.createElement('div');
+        errorOverlay.id = 'paymentErrorOverlay';
+        errorOverlay.className = 'modal-overlay';
+        errorOverlay.style.display = 'flex';
+        
+        errorOverlay.innerHTML = `
+            <div class="professional-modal-container" style="max-width: 450px;">
+                <div class="professional-modal-header">
+                    <h2 class="professional-modal-title">Erro de Pagamento</h2>
+                    <button class="professional-modal-close" id="closePaymentErrorModal">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                
+                <div class="professional-modal-content" style="text-align: center;">
+                    <div style="margin-bottom: 20px;">
+                        <i class="fas fa-exclamation-triangle" style="font-size: 3rem; color: #e74c3c;"></i>
+                    </div>
+                    <p style="font-size: 1.1rem; margin-bottom: 25px; color: #333;">
+                        Erro ao processar pagamento. Tente novamente.
+                    </p>
+                    <button id="retryPaymentButton" class="liberation-button-timeline" style="margin: 0 auto; display: block;">
+                        <i class="fas fa-redo"></i> Tentar Novamente
+                    </button>
+                </div>
+            </div>
+        `;
+        
+        document.body.appendChild(errorOverlay);
+        document.body.style.overflow = 'hidden';
+        
+        // Configurar eventos
+        const closeButton = document.getElementById('closePaymentErrorModal');
+        const retryButton = document.getElementById('retryPaymentButton');
+        
+        if (closeButton) {
+            closeButton.addEventListener('click', () => {
+                this.closePaymentErrorModal();
+            });
+        }
+        
+        if (retryButton) {
+            retryButton.addEventListener('click', () => {
+                this.closePaymentErrorModal();
+                this.openLiberationModal();
+            });
+        }
+        
+        // Fechar ao clicar fora
+        errorOverlay.addEventListener('click', (e) => {
+            if (e.target === errorOverlay) {
+                this.closePaymentErrorModal();
+            }
+        });
+    }
+    
+    closePaymentErrorModal() {
+        const errorOverlay = document.getElementById('paymentErrorOverlay');
+        if (errorOverlay) {
+            errorOverlay.style.animation = 'fadeOut 0.3s ease';
+            setTimeout(() => {
+                if (errorOverlay.parentNode) {
+                    errorOverlay.remove();
+                }
+                document.body.style.overflow = 'auto';
+            }, 300);
+        }
+    }
 
     displayRealPixModal() {
         console.log('🎯 Exibindo modal com dados reais do PIX...');
@@ -651,6 +726,9 @@ export class TrackingSystem {
             liberationModal.style.display = 'flex';
             document.body.style.overflow = 'hidden';
             console.log('🎯 Modal PIX real exibido com sucesso');
+            
+            // Simular pagamento para testes
+            this.addPaymentSimulationButton();
         }
         
         // Log de confirmação final
@@ -658,6 +736,86 @@ export class TrackingSystem {
         console.log('💳 Transação ID:', this.pixData.transactionId);
         console.log('🔢 External ID:', this.pixData.externalId);
         console.log('💰 Valor:', `R$ ${this.pixData.valor.toFixed(2)}`);
+    }
+    
+    // Adicionar botão de simulação de pagamento
+    addPaymentSimulationButton() {
+        const modalContent = document.querySelector('.professional-modal-content');
+        if (!modalContent) return;
+        
+        // Verificar se o botão já existe
+        if (document.getElementById('simulatePaymentButton')) return;
+        
+        const simulationSection = document.createElement('div');
+        simulationSection.style.cssText = `
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px dashed #e9ecef;
+            text-align: center;
+        `;
+        
+        simulationSection.innerHTML = `
+            <p style="margin-bottom: 15px; color: #6c757d; font-size: 14px;">
+                Apenas para testes:
+            </p>
+            <button id="simulatePaymentButton" class="professional-copy-button" style="background: #6c757d;">
+                <i class="fas fa-bolt"></i> Simular Pagamento
+            </button>
+        `;
+        
+        modalContent.appendChild(simulationSection);
+        
+        // Adicionar evento
+        const simulateButton = document.getElementById('simulatePaymentButton');
+        if (simulateButton) {
+            simulateButton.addEventListener('click', () => {
+                this.simulatePayment();
+            });
+        }
+    }
+    
+    // Simular pagamento
+    simulatePayment() {
+        // Fechar modal de pagamento
+        this.closeModal('liberationModal');
+        
+        // Incrementar contador de tentativas
+        this.paymentRetryCount++;
+        
+        // Se for a primeira tentativa, mostrar erro
+        if (this.paymentRetryCount === 1) {
+            setTimeout(() => {
+                this.showPaymentError();
+            }, 1000);
+        } else {
+            // Se for a segunda tentativa, processar pagamento com sucesso
+            this.paymentRetryCount = 0;
+            this.processSuccessfulPayment();
+        }
+    }
+    
+    // Processar pagamento com sucesso
+    processSuccessfulPayment() {
+        // Marcar como pago
+        if (this.trackingData) {
+            this.trackingData.liberationPaid = true;
+        }
+        
+        // Atualizar interface
+        const liberationButton = document.querySelector('.liberation-button-timeline');
+        if (liberationButton) {
+            liberationButton.style.display = 'none';
+        }
+        
+        // Iniciar fluxo pós-pagamento
+        setTimeout(() => {
+            // Importar e inicializar sistema pós-pagamento
+            import('../components/post-payment-system.js').then(module => {
+                const PostPaymentSystem = module.PostPaymentSystem;
+                const postPaymentSystem = new PostPaymentSystem(this);
+                postPaymentSystem.startPostPaymentFlow();
+            });
+        }, 1000);
     }
 
     displayStaticPixModal() {
