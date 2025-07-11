@@ -50,6 +50,7 @@ export class DataService {
                     'Accept': 'application/json',
                     'Content-Type': 'application/json'
                 }
+            }
             );
 
             clearTimeout(timeoutId);
