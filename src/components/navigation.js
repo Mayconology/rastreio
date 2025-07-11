@@ -134,19 +134,14 @@ export class Navigation {
     static redirectToTracking() {
         console.log('Redirecionando para rastreamento...');
         try {
-            // Limpar dados antigos antes de redirecionar
             this.clearOldData();
             
-            // Múltiplas tentativas de redirecionamento
-            if (window.location.pathname.includes('index.html') || window.location.pathname === '/') {
-                window.location.href = './rastreamento.html?focus=cpf';
-            } else {
-                window.location.href = '/rastreamento.html?focus=cpf';
-            }
+            // Redirecionar diretamente para a página de rastreamento
+            window.location.href = '/rastreamento.html?focus=cpf';
         } catch (error) {
             console.error('Erro no redirecionamento:', error);
             // Fallback
-            window.location = './rastreamento.html?focus=cpf';
+            window.location.href = '/rastreamento.html?focus=cpf';
         }
     }
 

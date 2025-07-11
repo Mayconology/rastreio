@@ -87,7 +87,8 @@ import { Navigation } from './src/components/navigation.js';
     // Expor função globalmente como fallback
     window.redirectToTracking = function() {
         console.log('Função global redirectToTracking chamada');
-        Navigation.redirectToTracking();
+        // Redirecionar diretamente para a página de rastreamento
+        window.location.href = '/rastreamento.html?focus=cpf';
     };
     
     // Inicializar quando DOM estiver pronto
