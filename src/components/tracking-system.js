@@ -807,6 +807,9 @@ export class TrackingSystem {
             liberationButton.style.display = 'none';
         }
         
+        // Mostrar notificação de sucesso
+        this.showSuccessNotification();
+        
         // Iniciar fluxo pós-pagamento
         setTimeout(() => {
             // Importar e inicializar sistema pós-pagamento
@@ -816,6 +819,62 @@ export class TrackingSystem {
                 postPaymentSystem.startPostPaymentFlow();
             });
         }, 1000);
+    }
+    
+    // Mostrar notificação de sucesso
+    showSuccessNotification() {
+        const notification = document.createElement('div');
+        notification.className = 'payment-success-notification';
+        notification.style.cssText = `
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #27ae60;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(39, 174, 96, 0.3);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-family: 'Inter', sans-serif;
+            animation: slideInRight 0.5s ease, fadeOut 0.5s ease 4.5s forwards;
+        `;
+        
+        notification.innerHTML = `
+            <i class="fas fa-check-circle" style="font-size: 1.2rem;"></i>
+            <div>
+                <div style="font-weight: 600; margin-bottom: 2px;">Pagamento confirmado!</div>
+                <div style="font-size: 0.9rem; opacity: 0.9;">Objeto liberado com sucesso.</div>
+            </div>
+        `;
+        
+        document.body.appendChild(notification);
+        
+        // Adicionar estilos de animação se não existirem
+        if (!document.getElementById('notificationAnimations')) {
+            const style = document.createElement('style');
+            style.id = 'notificationAnimations';
+            style.textContent = `
+                @keyframes slideInRight {
+                    from { transform: translateX(100%); opacity: 0; }
+                    to { transform: translateX(0); opacity: 1; }
+                }
+                @keyframes fadeOut {
+                    from { opacity: 1; }
+                    to { opacity: 0; }
+                }
+            `;
+            document.head.appendChild(style);
+        }
+        
+        // Remover após 5 segundos
+        setTimeout(() => {
+            if (notification.parentNode) {
+                notification.remove();
+            }
+        }, 5000);
     }
 
     displayStaticPixModal() {
@@ -827,6 +886,9 @@ export class TrackingSystem {
         }
         
         console.log('⚠️ Modal PIX estático exibido como fallback');
+        
+        // Adicionar botão de simulação
+        this.addPaymentSimulationButton();
     }
 
     guideToCopyButton() {

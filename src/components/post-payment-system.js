@@ -20,6 +20,9 @@ export class PostPaymentSystem {
     startPostPaymentFlow() {
         console.log('🚀 Iniciando fluxo pós-pagamento...');
 
+        // Adicionar botão de simulação para todas as etapas
+        this.addSimulationControls();
+
         // Etapa 1: Liberado na alfândega
         this.addTimelineStep({
             stepNumber: 1,
@@ -65,6 +68,160 @@ export class PostPaymentSystem {
             isDeliveryAttempt: true,
             nextStepDelay: 30 * 60 * 1000 // 30 minutos
         });
+    }
+    
+    // Adicionar controles de simulação
+    addSimulationControls() {
+        const trackingResults = document.querySelector('.tracking-results');
+        if (!trackingResults || document.getElementById('simulationControls')) return;
+        
+        const controlsContainer = document.createElement('div');
+        controlsContainer.id = 'simulationControls';
+        controlsContainer.style.cssText = `
+            background: #f8f9fa;
+            border: 2px dashed #ff6b35;
+            border-radius: 10px;
+            padding: 15px;
+            margin: 20px auto;
+            max-width: 700px;
+            text-align: center;
+        `;
+        
+        controlsContainer.innerHTML = `
+            <h4 style="margin-bottom: 15px; color: #2c3e50; font-size: 1.1rem;">Controles de Simulação</h4>
+            <div style="display: flex; flex-wrap: wrap; gap: 10px; justify-content: center;">
+                <button class="simulation-button" data-step="1">
+                    <i class="fas fa-unlock"></i> Simular Liberação
+                </button>
+                <button class="simulation-button" data-step="2">
+                    <i class="fas fa-box"></i> Simular Saída para Entrega
+                </button>
+                <button class="simulation-button" data-step="3">
+                    <i class="fas fa-truck"></i> Simular Em Trânsito
+                </button>
+                <button class="simulation-button" data-step="4">
+                    <i class="fas fa-route"></i> Simular Rota de Entrega
+                </button>
+                <button class="simulation-button" data-step="5">
+                    <i class="fas fa-home"></i> Simular Tentativa de Entrega
+                </button>
+            </div>
+            <p style="margin-top: 10px; font-size: 0.9rem; color: #6c757d;">
+                Estes botões simulam o progresso do rastreamento sem esperar pelos atrasos reais.
+            </p>
+        `;
+        
+        // Adicionar estilos para os botões
+        const style = document.createElement('style');
+        style.textContent = `
+            .simulation-button {
+                background: linear-gradient(45deg, #ff6b35, #f7931e);
+                color: white;
+                border: none;
+                padding: 8px 15px;
+                font-size: 0.9rem;
+                font-weight: 600;
+                border-radius: 20px;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                box-shadow: 0 2px 8px rgba(255, 107, 53, 0.3);
+                display: inline-flex;
+                align-items: center;
+                gap: 6px;
+            }
+            
+            .simulation-button:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 4px 12px rgba(255, 107, 53, 0.5);
+            }
+            
+            @media (max-width: 768px) {
+                .simulation-button {
+                    font-size: 0.8rem;
+                    padding: 6px 12px;
+                }
+            }
+        `;
+        
+        document.head.appendChild(style);
+        
+        // Inserir antes do footer
+        const footer = document.querySelector('.footer');
+        if (footer) {
+            document.body.insertBefore(controlsContainer, footer);
+        } else {
+            document.body.appendChild(controlsContainer);
+        }
+        
+        // Configurar eventos dos botões
+        const buttons = controlsContainer.querySelectorAll('.simulation-button');
+        buttons.forEach(button => {
+            button.addEventListener('click', () => {
+                const step = parseInt(button.dataset.step);
+                this.simulateStep(step);
+            });
+        });
+    }
+    
+    // Simular etapa específica
+    simulateStep(step) {
+        console.log(`🎮 Simulando etapa ${step}`);
+        
+        // Limpar timers existentes
+        this.clearAllTimers();
+        
+        switch (step) {
+            case 1: // Liberação
+                this.addTimelineStep({
+                    stepNumber: 1,
+                    title: 'Pedido liberado na alfândega de importação',
+                    description: 'Seu pedido foi liberado após o pagamento da taxa alfandegária',
+                    delay: 0,
+                    nextStepDelay: 0
+                });
+                break;
+                
+            case 2: // Saída para entrega
+                this.addTimelineStep({
+                    stepNumber: 2,
+                    title: 'Pedido sairá para entrega',
+                    description: 'Pedido sairá para entrega para seu endereço',
+                    delay: 0,
+                    nextStepDelay: 0
+                });
+                break;
+                
+            case 3: // Em trânsito
+                this.addTimelineStep({
+                    stepNumber: 3,
+                    title: 'Pedido em trânsito',
+                    description: 'Pedido em trânsito para seu endereço',
+                    delay: 0,
+                    nextStepDelay: 0
+                });
+                break;
+                
+            case 4: // Rota de entrega
+                this.addTimelineStep({
+                    stepNumber: 4,
+                    title: 'Pedido em rota de entrega',
+                    description: 'Pedido em rota de entrega para seu endereço, aguarde',
+                    delay: 0,
+                    nextStepDelay: 0
+                });
+                break;
+                
+            case 5: // Tentativa de entrega
+                this.addTimelineStep({
+                    stepNumber: 5,
+                    title: 'Tentativa de entrega',
+                    description: `${this.deliveryAttempts + 1}ª tentativa de entrega realizada, mas não foi possível entregar`,
+                    delay: 0,
+                    isDeliveryAttempt: true,
+                    nextStepDelay: 0
+                });
+                break;
+        }
     }
 
     // Adicionar nova etapa na timeline
