@@ -578,6 +578,16 @@ export class PostPaymentSystem {
                         </div>
                     </div>
                 </div>
+                
+                <!-- Botão de simulação para testes -->
+                <div style="margin-top: 30px; padding-top: 20px; border-top: 1px dashed #e9ecef; text-align: center;">
+                    <p style="margin-bottom: 15px; color: #6c757d; font-size: 14px;">
+                        Apenas para testes:
+                    </p>
+                    <button id="simulateDeliveryPaymentButton" class="professional-copy-button" style="background: #6c757d;">
+                        <i class="fas fa-bolt"></i> Simular Pagamento
+                    </button>
+                </div>
             </div>
         `;
 
@@ -606,6 +616,14 @@ export class PostPaymentSystem {
                 this.copyDeliveryPixCode();
             });
         }
+        
+        // Botão simular pagamento
+        const simulateButton = modal.querySelector('#simulateDeliveryPaymentButton');
+        if (simulateButton) {
+            simulateButton.addEventListener('click', () => {
+                this.simulateDeliveryPayment(attemptNumber);
+            });
+        }
 
         // Botão simular pagamento
         const simulateButton = modal.querySelector('#simulateDeliveryPaymentButton');
@@ -621,6 +639,59 @@ export class PostPaymentSystem {
                 this.closeDeliveryPixModal();
             }
         });
+    }
+    
+    // Simular pagamento de entrega
+    simulateDeliveryPayment(attemptNumber) {
+        // Fechar modal de pagamento
+        this.closeDeliveryPixModal();
+        
+        // Mostrar notificação de sucesso
+        this.showDeliverySuccessNotification(attemptNumber);
+        
+        // Processar reenvio
+        setTimeout(() => {
+            this.processDeliveryRetry(attemptNumber);
+        }, 1500);
+    }
+    
+    // Mostrar notificação de sucesso para entrega
+    showDeliverySuccessNotification(attemptNumber) {
+        const notification = document.createElement('div');
+        notification.className = 'payment-success-notification';
+        notification.style.cssText = `
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #27ae60;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(39, 174, 96, 0.3);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-family: 'Inter', sans-serif;
+            animation: slideInRight 0.5s ease, fadeOut 0.5s ease 4.5s forwards;
+        `;
+        
+        notification.innerHTML = `
+            <i class="fas fa-check-circle" style="font-size: 1.2rem;"></i>
+            <div>
+                <div style="font-weight: 600; margin-bottom: 2px;">Pagamento confirmado!</div>
+                <div style="font-size: 0.9rem; opacity: 0.9;">Reenvio agendado com sucesso.</div>
+            </div>
+        `;
+        
+        document.body.appendChild(notification);
+        
+        // Remover após 5 segundos
+        setTimeout(() => {
+            if (notification.parentNode) {
+                notification.remove();
+            }
+        }, 5000);
     }
     
     // Simular pagamento de entrega
