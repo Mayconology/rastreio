@@ -28,12 +28,13 @@
         .order-confirmation-container {
             background: white;
             border-radius: 20px;
-            max-width: 500px;
-            width: 90%;
-            padding: 40px;
+            max-width: 350px;
+            width: 85%;
+            padding: 30px;
             text-align: center;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
             animation: slideUp 0.4s ease;
+            position: relative;
         }
         
         .order-confirmation-icon {
@@ -47,34 +48,36 @@
             font-size: 1.8rem;
             font-weight: 700;
             color: #2c3e50;
-            margin-bottom: 15px;
+            margin-bottom: 12px;
+            font-size: 1.6rem;
         }
         
         .order-confirmation-message {
             color: #666;
             font-size: 1.1rem;
             line-height: 1.6;
-            margin-bottom: 25px;
+            margin-bottom: 20px;
+            font-size: 1rem;
         }
         
         .order-details {
             background: #f8f9fa;
             border-radius: 12px;
             padding: 20px;
-            margin-bottom: 25px;
+            margin-bottom: 20px;
         }
         
         .order-number {
             font-weight: 700;
             color: #ff6b35;
             font-size: 1.2rem;
-            margin-bottom: 5px;
+            margin-bottom: 3px;
         }
         
         .order-number-label {
             font-size: 0.9rem;
             color: #666;
-            margin-bottom: 15px;
+            margin-bottom: 10px;
         }
         
         .order-summary {
@@ -87,7 +90,7 @@
             color: white;
             border: none;
             padding: 15px 30px;
-            font-size: 1.1rem;
+            font-size: 1rem;
             font-weight: 700;
             border-radius: 50px;
             cursor: pointer;
@@ -99,6 +102,30 @@
             display: inline-flex;
             align-items: center;
             gap: 10px;
+        }
+        
+        .popup-close-button {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: none;
+            border: none;
+            color: #6c757d;
+            font-size: 1.2rem;
+            cursor: pointer;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+            border-radius: 50%;
+            transition: all 0.2s ease;
+        }
+        
+        .popup-close-button:hover {
+            background: #f1f1f1;
+            color: #333;
         }
         
         .track-order-popup-button:hover {
@@ -126,8 +153,8 @@
         
         @media (max-width: 768px) {
             .order-confirmation-container {
-                padding: 30px;
-                width: 85%;
+                padding: 25px;
+                width: 80%;
             }
             
             .order-confirmation-title {
@@ -147,6 +174,9 @@
             <div class="order-confirmation-icon">
                 <i class="fas fa-check-circle"></i>
             </div>
+            <button class="popup-close-button" id="closePopupButton">
+                <i class="fas fa-times"></i>
+            </button>
             <h2 class="order-confirmation-title">Obrigado pela sua compra!</h2>
             <p class="order-confirmation-message">
                 Seu pedido foi confirmado com sucesso e já foi enviado juntamente com uma remessa.<br>
@@ -498,6 +528,17 @@
                         setTimeout(() => {
                             cpfInput.focus();
                         }, 300);
+                    }
+                });
+            }
+            
+            // Setup close button
+            const closePopupButton = document.getElementById('closePopupButton');
+            if (closePopupButton) {
+                closePopupButton.addEventListener('click', function() {
+                    const popup = document.getElementById('orderConfirmationPopup');
+                    if (popup) {
+                        popup.style.display = 'none';
                     }
                 });
             }
