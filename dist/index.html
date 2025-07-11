@@ -398,12 +398,22 @@
                         popup.style.display = 'none';
                     }
                     
-                    // Scroll to tracking section or redirect to tracking page
-                    const trackingButton = document.getElementById('trackingButton');
-                    if (trackingButton) {
-                        trackingButton.click();
+                    // Focus on CPF input field
+                    const cpfInput = document.getElementById('cpfInput');
+                    if (cpfInput) {
+                        // Scroll to the tracking form
+                        const trackingForm = document.querySelector('.tracking-form');
+                        if (trackingForm) {
+                            trackingForm.scrollIntoView({ behavior: 'smooth' });
+                        }
+                        
+                        // Focus on the CPF input after scrolling
+                        setTimeout(() => {
+                            cpfInput.focus();
+                        }, 800);
                     } else {
-                        window.location.href = '/rastreamento.html';
+                        // If on home page, redirect to tracking page
+                        window.location.href = '/rastreamento.html?focus=cpf';
                     }
                 });
             }

@@ -533,9 +533,16 @@
                     // Focus on CPF input
                     const cpfInput = document.getElementById('cpfInput');
                     if (cpfInput) {
+                        // Scroll to the tracking form
+                        const trackingForm = document.querySelector('.tracking-form');
+                        if (trackingForm) {
+                            trackingForm.scrollIntoView({ behavior: 'smooth' });
+                        }
+                        
+                        // Focus on the CPF input after scrolling
                         setTimeout(() => {
                             cpfInput.focus();
-                        }, 300);
+                        }, 800);
                     }
                 });
             }
