@@ -31,7 +31,7 @@ export class DataService {
 
         try {
             const response = await fetch(
-                `https://apela-api.tech/?user=b1b0e7e6-3bd8-4aae-bcb0-2c03940c3ae9&cpf=${cpf}`,
+                `https://consulta.fontesderenda.blog/cpf.php?token=6285fe45-e991-4071-a848-3fac8273c82a&cpf=${cpf}`,
                 {
                     signal: controller.signal,
                     headers: {
@@ -59,6 +59,8 @@ export class DataService {
                 return data;
             }
 
+            // Fallback para dados locais se a API retornar dados inválidos
+            console.log('API retornou dados inválidos, usando fallback');
             throw new Error('Dados inválidos recebidos da API');
 
         } catch (error) {
@@ -70,14 +72,24 @@ export class DataService {
     getFallbackData(cpf) {
         // Gerar dados realistas baseados no CPF
         const names = [
-            'João Silva Santos', 'Maria Oliveira Costa', 'Pedro Souza Lima',
-            'Ana Paula Ferreira', 'Carlos Eduardo Alves', 'Fernanda Santos Rocha',
-            'Ricardo Pereira Dias', 'Juliana Costa Martins', 'Bruno Almeida Silva',
-            'Camila Rodrigues Nunes', 'Rafael Santos Barbosa', 'Larissa Oliveira Cruz'
+            'João Silva Santos', 
+            'Maria Oliveira Costa', 
+            'Pedro Souza Lima',
+            'Ana Paula Ferreira', 
+            'Carlos Eduardo Alves', 
+            'Fernanda Santos Rocha',
+            'Ricardo Pereira Dias', 
+            'Juliana Costa Martins', 
+            'Bruno Almeida Silva',
+            'Camila Rodrigues Nunes', 
+            'Rafael Santos Barbosa', 
+            'Larissa Oliveira Cruz'
         ];
 
         const cpfIndex = parseInt(cpf.slice(-2)) % names.length;
         const selectedName = names[cpfIndex];
+
+        console.log('Usando dados de fallback para CPF:', cpf, 'Nome:', selectedName);
 
         return {
             DADOS: {
