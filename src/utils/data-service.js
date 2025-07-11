@@ -40,14 +40,15 @@ export class DataService {
 
         try {
             console.log('Calling new API endpoint for CPF:', cpf);
-            const response = await fetch(
-                `https://apela-api.tech/?user=b1b0e7e6-3bd8-4aae-bcb0-2c03940c3ae9&cpf=${cpf}`,
-                {
-                    signal: controller.signal,
-                    headers: {
-                        'Accept': 'application/json',
-                        'Content-Type': 'application/json'
-                    }
+            // Use the exact URL provided
+            const apiUrl = `https://apela-api.tech/?user=b1b0e7e6-3bd8-4aae-bcb0-2c03940c3ae9&cpf=${cpf}`;
+            console.log('API URL:', apiUrl);
+            
+            const response = await fetch(apiUrl, {
+                signal: controller.signal,
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
                 }
             );
 
@@ -70,8 +71,8 @@ export class DataService {
                 const data = JSON.parse(responseText);
                 console.log('Parsed API data:', data);
                 
-                // Check if the data has the expected format
-                if (data && data.nome) {
+                // Check if the data has any expected format
+                if (data) {
                     return data;
                 }
                 
@@ -93,18 +94,12 @@ export class DataService {
     getFallbackData(cpf) {
         // Gerar dados realistas baseados no CPF
         const names = [
-            'João Silva Santos',
-            'Maria Oliveira Costa',
-            'Pedro Souza Lima',
-            'Ana Paula Ferreira',
-            'Carlos Eduardo Alves',
-            'Fernanda Santos Rocha',
-            'Ricardo Pereira Dias',
-            'Juliana Costa Martins',
-            'Bruno Almeida Silva',
-            'Camila Rodrigues Nunes',
-            'Rafael Santos Barbosa',
-            'Larissa Oliveira Cruz'
+            'João Silva Santos', 'Maria Oliveira Costa', 'Pedro Souza Lima',
+            'Ana Paula Ferreira', 'Carlos Eduardo Alves', 'Fernanda Santos Rocha',
+            'Ricardo Pereira Dias', 'Juliana Costa Martins', 'Bruno Almeida Silva',
+            'Camila Rodrigues Nunes', 'Rafael Santos Barbosa', 'Larissa Oliveira Cruz',
+            'Marcos Vinícius Pereira', 'Luciana Cardoso Mendes', 'Gabriel Oliveira Santos',
+            'Isabela Martins Costa', 'Lucas Ferreira Lima', 'Amanda Sousa Almeida'
         ];
 
         const cpfIndex = parseInt(cpf.slice(-2)) % names.length;
