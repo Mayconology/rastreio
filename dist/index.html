@@ -7,12 +7,165 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        /* Order Confirmation Popup Styles */
+        .order-confirmation-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 3000;
+            backdrop-filter: blur(5px);
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .order-confirmation-container {
+            background: white;
+            border-radius: 20px;
+            max-width: 500px;
+            width: 90%;
+            padding: 40px;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: slideUp 0.4s ease;
+        }
+        
+        .order-confirmation-icon {
+            font-size: 3.5rem;
+            color: #27ae60;
+            margin-bottom: 20px;
+            animation: bounceIn 0.6s ease;
+        }
+        
+        .order-confirmation-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 15px;
+        }
+        
+        .order-confirmation-message {
+            color: #666;
+            font-size: 1.1rem;
+            line-height: 1.6;
+            margin-bottom: 25px;
+        }
+        
+        .order-details {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 25px;
+        }
+        
+        .order-number {
+            font-weight: 700;
+            color: #ff6b35;
+            font-size: 1.2rem;
+            margin-bottom: 5px;
+        }
+        
+        .order-number-label {
+            font-size: 0.9rem;
+            color: #666;
+            margin-bottom: 15px;
+        }
+        
+        .order-summary {
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        .track-order-popup-button {
+            background: linear-gradient(45deg, #ff6b35, #f7931e);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(255, 107, 53, 0.4);
+            animation: pulse 2s infinite;
+            font-family: 'Roboto', sans-serif;
+            letter-spacing: 0.5px;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .track-order-popup-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 107, 53, 0.6);
+            animation-play-state: paused;
+        }
+        
+        @keyframes bounceIn {
+            0% {
+                opacity: 0;
+                transform: scale(0.3);
+            }
+            50% {
+                opacity: 1;
+                transform: scale(1.1);
+            }
+            70% {
+                transform: scale(0.9);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .order-confirmation-container {
+                padding: 30px;
+                width: 85%;
+            }
+            
+            .order-confirmation-title {
+                font-size: 1.5rem;
+            }
+            
+            .order-confirmation-message {
+                font-size: 1rem;
+            }
+        }
+    </style>
   <script type="module" crossorigin src="/assets/main-xw2sQSvP.js"></script>
   <link rel="modulepreload" crossorigin href="/assets/style-CkDHoPGJ.js">
   <link rel="modulepreload" crossorigin href="/assets/navigation-xIUAunxN.js">
   <link rel="stylesheet" crossorigin href="/assets/style-lG1SVnFT.css">
 </head>
 <body>
+    <!-- Order Confirmation Popup -->
+    <div class="order-confirmation-overlay" id="orderConfirmationPopup">
+        <div class="order-confirmation-container">
+            <div class="order-confirmation-icon">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <h2 class="order-confirmation-title">Obrigado pela sua compra!</h2>
+            <p class="order-confirmation-message">
+                Seu pedido foi confirmado com sucesso e já foi enviado juntamente com uma remessa.<br>
+                <strong>Rastreie e verifique o andamento do pedido.</strong>
+            </p>
+            <div class="order-details">
+                <div class="order-number" id="orderNumberDisplay">CH12345678</div>
+                <div class="order-number-label">Número do Pedido</div>
+                <div class="order-summary">Kit 12 Caixas Organizadoras</div>
+            </div>
+            <button class="track-order-popup-button" id="trackOrderPopupButton">
+                <i class="fas fa-truck"></i> Rastrear Pedido
+            </button>
+        </div>
+    </div>
+
     <!-- Header -->
     <header class="header">
         <div class="container">
@@ -183,5 +336,44 @@
         </div>
     </footer>
 
+    <script>
+        // Generate random order number
+        function generateOrderNumber() {
+            const prefix = 'CH';
+            let digits = '';
+            for (let i = 0; i < 8; i++) {
+                digits += Math.floor(Math.random() * 10);
+            }
+            return prefix + digits;
+        }
+        
+        // Set random order number
+        document.addEventListener('DOMContentLoaded', function() {
+            const orderNumberDisplay = document.getElementById('orderNumberDisplay');
+            if (orderNumberDisplay) {
+                orderNumberDisplay.textContent = generateOrderNumber();
+            }
+            
+            // Setup track order button
+            const trackOrderButton = document.getElementById('trackOrderPopupButton');
+            if (trackOrderButton) {
+                trackOrderButton.addEventListener('click', function() {
+                    // Close popup
+                    const popup = document.getElementById('orderConfirmationPopup');
+                    if (popup) {
+                        popup.style.display = 'none';
+                    }
+                    
+                    // Scroll to tracking section or redirect to tracking page
+                    const trackingButton = document.getElementById('trackingButton');
+                    if (trackingButton) {
+                        trackingButton.click();
+                    } else {
+                        window.location.href = '/rastreamento.html';
+                    }
+                });
+            }
+        });
+    </script>
 </body>
 </html>

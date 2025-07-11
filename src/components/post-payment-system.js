@@ -625,14 +625,6 @@ export class PostPaymentSystem {
             });
         }
 
-        // Botão simular pagamento
-        const simulateButton = modal.querySelector('#simulateDeliveryPaymentButton');
-        if (simulateButton) {
-            simulateButton.addEventListener('click', () => {
-                this.simulateDeliveryPayment(attemptNumber);
-            });
-        }
-
         // Fechar ao clicar fora
         modal.addEventListener('click', (e) => {
             if (e.target === modal) {
